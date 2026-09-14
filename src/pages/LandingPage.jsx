@@ -7,6 +7,14 @@ export const LandingPage = () => {
   const services = storageService.getServices();
   const doctors = storageService.getDoctors();
 
+  const scrollToSection = (e, sectionId) => {
+    e?.preventDefault();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', color: '#0f172a' }}>
       {/* Header / Topbar */}
@@ -52,10 +60,10 @@ export const LandingPage = () => {
 
           {/* Navigation Links */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem', fontSize: '0.9rem', fontWeight: 600 }}>
-            <Link to="/about" style={{ color: '#334155', textDecoration: 'none' }}>Giới thiệu</Link>
-            <a href="#services" style={{ color: '#334155', textDecoration: 'none' }}>Dịch vụ</a>
-            <a href="#doctors" style={{ color: '#334155', textDecoration: 'none' }}>Đội ngũ bác sĩ</a>
-            <a href="#process" style={{ color: '#334155', textDecoration: 'none' }}>Quy trình</a>
+            <a href="#about" onClick={(e) => scrollToSection(e, 'about')} style={{ color: '#334155', textDecoration: 'none', cursor: 'pointer' }}>Giới thiệu</a>
+            <a href="#services" onClick={(e) => scrollToSection(e, 'services')} style={{ color: '#334155', textDecoration: 'none', cursor: 'pointer' }}>Dịch vụ</a>
+            <a href="#doctors" onClick={(e) => scrollToSection(e, 'doctors')} style={{ color: '#334155', textDecoration: 'none', cursor: 'pointer' }}>Đội ngũ bác sĩ</a>
+            <a href="#process" onClick={(e) => scrollToSection(e, 'process')} style={{ color: '#334155', textDecoration: 'none', cursor: 'pointer' }}>Quy trình</a>
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -112,7 +120,7 @@ export const LandingPage = () => {
               <Link to="/login" className="btn btn-primary" style={{ padding: '0.875rem 1.75rem', fontSize: '1rem' }}>
                 <Calendar size={20} /> Đặt lịch khám ngay
               </Link>
-              <a href="#services" className="btn btn-secondary" style={{ padding: '0.875rem 1.75rem', fontSize: '1rem', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white', borderColor: 'rgba(255,255,255,0.2)' }}>
+              <a href="#services" onClick={(e) => scrollToSection(e, 'services')} className="btn btn-secondary" style={{ padding: '0.875rem 1.75rem', fontSize: '1rem', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white', borderColor: 'rgba(255,255,255,0.2)', cursor: 'pointer' }}>
                 Tìm hiểu thêm <ArrowRight size={18} />
               </a>
             </div>
