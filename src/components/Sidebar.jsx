@@ -34,6 +34,7 @@ export const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
     { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/admin/patients', label: 'Bệnh nhân', icon: Users },
     { to: '/admin/doctors', label: 'Bác sĩ', icon: UserCheck },
+    { to: '/admin/leave-requests', label: 'Duyệt nghỉ phép', icon: CalendarDays },
     { to: '/admin/services', label: 'Dịch vụ', icon: Stethoscope },
     { to: '/admin/appointments', label: 'Lịch hẹn', icon: Calendar },
     { to: '/admin/calendar', label: 'Lịch khám', icon: CalendarDays },
@@ -47,6 +48,14 @@ export const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
     { to: '/admin/reports', label: 'Báo cáo', icon: BarChart3 }
   ];
 
+  const doctorNav = [
+    { to: '/doctor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/doctor/appointments', label: 'Lịch khám của tôi', icon: Calendar },
+    { to: '/doctor/patients', label: 'Bệnh nhân phụ trách', icon: Users },
+    { to: '/doctor/leave-requests', label: 'Xin nghỉ & Đi làm', icon: CalendarDays },
+    { to: '/doctor/notifications', label: 'Thông báo', icon: Bell }
+  ];
+
   const patientNav = [
     { to: '/patient/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/patient/profile', label: 'Hồ sơ cá nhân', icon: Users },
@@ -58,7 +67,7 @@ export const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
     { to: '/patient/notifications', label: 'Thông báo', icon: Bell }
   ];
 
-  const items = user?.role === 'ADMIN' ? adminNav : patientNav;
+  const items = user?.role === 'ADMIN' ? adminNav : user?.role === 'DOCTOR' ? doctorNav : patientNav;
 
   return (
     <aside style={{
@@ -108,9 +117,9 @@ export const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
         margin: '1rem 1.25rem 0.5rem 1.25rem',
         padding: '0.5rem 0.75rem',
         borderRadius: '8px',
-        backgroundColor: user?.role === 'ADMIN' ? '#0284c71e' : '#10b9811e',
-        border: `1px solid ${user?.role === 'ADMIN' ? '#0ea5e940' : '#10b98140'}`,
-        color: user?.role === 'ADMIN' ? '#38bdf8' : '#34d399',
+        backgroundColor: user?.role === 'ADMIN' ? '#0284c71e' : user?.role === 'DOCTOR' ? '#f59e0b1e' : '#10b9811e',
+        border: `1px solid ${user?.role === 'ADMIN' ? '#0ea5e940' : user?.role === 'DOCTOR' ? '#f59e0b40' : '#10b98140'}`,
+        color: user?.role === 'ADMIN' ? '#38bdf8' : user?.role === 'DOCTOR' ? '#fbbf24' : '#34d399',
         fontSize: '0.75rem',
         fontWeight: 700,
         display: 'flex',

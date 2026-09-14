@@ -23,6 +23,8 @@ export const LoginPage = () => {
     if (res.success) {
       if (res.user.role === 'ADMIN') {
         navigate('/admin/dashboard');
+      } else if (res.user.role === 'DOCTOR') {
+        navigate('/doctor/dashboard');
       } else {
         navigate('/patient/dashboard');
       }
@@ -35,7 +37,10 @@ export const LoginPage = () => {
     setError('');
     let u = 'admin';
     let p = 'admin123';
-    if (role === 'PATIENT') {
+    if (role === 'DOCTOR') {
+      u = 'doctor';
+      p = 'doctor123';
+    } else if (role === 'PATIENT') {
       u = 'patient';
       p = 'patient123';
     }
@@ -47,6 +52,8 @@ export const LoginPage = () => {
     if (res.success) {
       if (res.user.role === 'ADMIN') {
         navigate('/admin/dashboard');
+      } else if (res.user.role === 'DOCTOR') {
+        navigate('/doctor/dashboard');
       } else {
         navigate('/patient/dashboard');
       }
@@ -127,13 +134,13 @@ export const LoginPage = () => {
           <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             ⚡ Nút đăng nhập nhanh Demo (GitHub Pages):
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
             <button
               type="button"
               onClick={() => setDemoCredentialsAndLogin('ADMIN')}
               style={{
-                padding: '0.625rem 0.5rem',
-                fontSize: '0.8rem',
+                padding: '0.625rem 0.35rem',
+                fontSize: '0.75rem',
                 fontWeight: 700,
                 borderRadius: '8px',
                 border: username === 'admin' ? '1px solid #0ea5e9' : '1px solid #334155',
@@ -143,17 +150,37 @@ export const LoginPage = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.35rem'
+                gap: '0.25rem'
               }}
             >
-              <ShieldCheck size={16} /> Admin (admin)
+              <ShieldCheck size={14} /> Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => setDemoCredentialsAndLogin('DOCTOR')}
+              style={{
+                padding: '0.625rem 0.35rem',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                borderRadius: '8px',
+                border: username === 'doctor' ? '1px solid #f59e0b' : '1px solid #334155',
+                backgroundColor: username === 'doctor' ? '#f59e0b20' : '#1e293b',
+                color: username === 'doctor' ? '#fbbf24' : '#cbd5e1',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.25rem'
+              }}
+            >
+              <UserCheck size={14} /> Doctor
             </button>
             <button
               type="button"
               onClick={() => setDemoCredentialsAndLogin('PATIENT')}
               style={{
-                padding: '0.625rem 0.5rem',
-                fontSize: '0.8rem',
+                padding: '0.625rem 0.35rem',
+                fontSize: '0.75rem',
                 fontWeight: 700,
                 borderRadius: '8px',
                 border: username === 'patient' ? '1px solid #10b981' : '1px solid #334155',
@@ -163,10 +190,10 @@ export const LoginPage = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.35rem'
+                gap: '0.25rem'
               }}
             >
-              <UserCheck size={16} /> Patient (patient)
+              <UserCheck size={14} /> Patient
             </button>
           </div>
         </div>

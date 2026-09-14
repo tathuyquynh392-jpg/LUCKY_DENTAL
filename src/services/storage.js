@@ -12,15 +12,34 @@ const KEYS = {
   INVOICES: 'lucky_dental_invoices',
   PAYMENTS: 'lucky_dental_payments',
   NOTIFICATIONS: 'lucky_dental_notifications',
+  LEAVE_REQUESTS: 'lucky_dental_leave_requests',
   CURRENT_USER: 'lucky_dental_current_user'
 };
 
 // Default Pre-populated Demo Data with exact credentials
 const DEFAULT_USERS = [
   { id: 'usr-admin', username: 'admin', email: 'admin@luckydental.com', password: 'admin123', name: 'Nguyễn Văn Quản Lý', role: 'ADMIN', status: 'ACTIVE', phone: '0901234567', createdAt: '2026-01-01' },
+  { id: 'usr-doc1', username: 'doctor', email: 'tuan.tran@luckydental.com', password: 'doctor123', name: 'BS. CKII. Trần Minh Tuấn', role: 'DOCTOR', status: 'ACTIVE', phone: '0912345678', doctorId: 'doc-1', createdAt: '2026-01-01' },
   { id: 'usr-pat1', username: 'patient', email: 'patient@luckydental.com', password: 'patient123', name: 'Trần Thị Bệnh Nhân', role: 'PATIENT', status: 'ACTIVE', phone: '0988776655', patientId: 'pat-1', createdAt: '2026-01-10' },
   { id: 'usr-pat2', username: 'lemai', email: 'mai.le@gmail.com', password: 'patient123', name: 'Lê Thị Mai', role: 'PATIENT', status: 'ACTIVE', phone: '0977112233', patientId: 'pat-2', createdAt: '2026-01-15' },
   { id: 'usr-pat3', username: 'hoanglong', email: 'long.pham@gmail.com', password: 'patient123', name: 'Phạm Hoàng Long', role: 'PATIENT', status: 'ACTIVE', phone: '0909888777', patientId: 'pat-3', createdAt: '2026-02-01' }
+];
+
+const DEFAULT_LEAVE_REQUESTS = [
+  { id: 'lr-1', doctorId: 'doc-1', doctorName: 'BS. CKII. Trần Minh Tuấn', startDate: '2026-09-25', endDate: '2026-09-27', reason: 'Tham gia hội nghị Nha khoa Châu Á tại Singapore', status: 'APPROVED', adminNote: 'Đã duyệt ca trực', createdAt: '2026-09-10' },
+  { id: 'lr-2', doctorId: 'doc-3', doctorName: 'ThS. BS. Vũ Quốc Bảo', startDate: '2026-09-20', endDate: '2026-09-21', reason: 'Bận việc gia đình cá nhân', status: 'PENDING', adminNote: '', createdAt: '2026-09-14' }
+];
+
+export const DOCTOR_SPECIALTIES = [
+  'Nha khoa tổng quát',
+  'Răng trẻ em',
+  'Chỉnh nha',
+  'Nội nha',
+  'Nha chu',
+  'Phục hình răng',
+  'Implant',
+  'Phẫu thuật miệng',
+  'Răng Hàm Mặt'
 ];
 
 const DEFAULT_PATIENTS = [
@@ -127,6 +146,7 @@ export const storageService = {
     getStorage(KEYS.INVOICES, DEFAULT_INVOICES);
     getStorage(KEYS.PAYMENTS, DEFAULT_PAYMENTS);
     getStorage(KEYS.NOTIFICATIONS, DEFAULT_NOTIFICATIONS);
+    getStorage(KEYS.LEAVE_REQUESTS, DEFAULT_LEAVE_REQUESTS);
 
     // Auto-repair user list in localStorage if password field is missing
     this.getUsers();
@@ -427,6 +447,46 @@ export const storageService = {
   markAllNotificationsRead(userId) {
     const list = this.getNotifications().map(n => (!userId || n.userId === userId) ? { ...n, isRead: true } : n);
     this.saveNotifications(list);
+  },
+
+  // DOCTOR LEAVE REQUESTS
+  getDoctorLeaveRequests() { return getStorage(KEYS.LEAVE_REQUESTS, DEFAULT_LEAVE_REQUESTS); },
+  saveDoctorLeaveRequests(list) { setStorage(KEYS.LEAVE_REQUESTS, list); },
+  addDoctorLeaveRequest(req) {
+    const list = this.getDoctorLeaveRequests();
+    const newReq = {
+      ...req,
+      id: 'lr-' + Date.now(),
+      status: req.status || 'PENDING',
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+    list.unshift(newReq);
+    this.saveDoctorLeaveRequests(list);
+
+    this.addNotification({
+      userId: 'usr-admin',
+      title: 'Yêu cầu xin nghỉ phép mới',
+      message: `Bác sĩ ${req.doctorName} vừa gửi yêu cầu xin nghỉ từ ${req.startDate} đến ${req.endDate}.`
+    });
+
+    return newReq;
+  },
+  updateDoctorLeaveRequest(id, updated) {
+    const list = this.getDoctorLeaveRequests().map(l => l.id === id ? { ...l, ...updated } : l);
+    this.saveDoctorLeaveRequests(list);
+
+    // If approved, check if today is within leave range to update doctor status
+    const target = list.find(l => l.id === id);
+    if (target && updated.status === 'APPROVED') {
+      const today = new Date().toISOString().split('T')[0];
+      if (today >= target.startDate && today <= target.endDate) {
+        this.updateDoctor(target.doctorId, { status: 'Nghỉ phép' });
+      }
+    }
+  },
+  deleteDoctorLeaveRequest(id) {
+    const list = this.getDoctorLeaveRequests().filter(l => l.id !== id);
+    this.saveDoctorLeaveRequests(list);
   }
 };
 

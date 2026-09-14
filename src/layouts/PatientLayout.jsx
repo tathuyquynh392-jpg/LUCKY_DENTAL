@@ -17,6 +17,10 @@ export const PatientLayout = () => {
     return <Navigate to="/admin/dashboard" replace />;
   }
 
+  if (user.role === 'DOCTOR') {
+    return <Navigate to="/doctor/dashboard" replace />;
+  }
+
   return (
     <div className="app-container">
       <Sidebar isMobileOpen={isMobileOpen} toggleMobileSidebar={() => setIsMobileOpen(!isMobileOpen)} />

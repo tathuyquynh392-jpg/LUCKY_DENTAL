@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 
 // Layouts
 import { AdminLayout } from './layouts/AdminLayout';
+import { DoctorLayout } from './layouts/DoctorLayout';
 import { PatientLayout } from './layouts/PatientLayout';
 
 // Public Pages
@@ -17,6 +18,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { PatientManagement } from './pages/admin/PatientManagement';
 import { PatientDetail } from './pages/admin/PatientDetail';
 import { DoctorManagement } from './pages/admin/DoctorManagement';
+import { DoctorLeaveManagement } from './pages/admin/DoctorLeaveManagement';
 import { ServiceManagement } from './pages/admin/ServiceManagement';
 import { AppointmentManagement } from './pages/admin/AppointmentManagement';
 import { CalendarView } from './pages/admin/CalendarView';
@@ -28,6 +30,12 @@ import { PaymentManagement } from './pages/admin/PaymentManagement';
 import { UserManagement } from './pages/admin/UserManagement';
 import { NotificationManagement } from './pages/admin/NotificationManagement';
 import { Reports } from './pages/admin/Reports';
+
+// Doctor Pages
+import { DoctorDashboard } from './pages/doctor/DoctorDashboard';
+import { DoctorAppointments } from './pages/doctor/DoctorAppointments';
+import { DoctorPatients } from './pages/doctor/DoctorPatients';
+import { DoctorLeaveRequests } from './pages/doctor/DoctorLeaveRequests';
 
 // Patient Pages
 import { PatientDashboard } from './pages/patient/PatientDashboard';
@@ -56,6 +64,7 @@ export default function App() {
             <Route path="patients" element={<PatientManagement />} />
             <Route path="patients/:id" element={<PatientDetail />} />
             <Route path="doctors" element={<DoctorManagement />} />
+            <Route path="leave-requests" element={<DoctorLeaveManagement />} />
             <Route path="services" element={<ServiceManagement />} />
             <Route path="appointments" element={<AppointmentManagement />} />
             <Route path="calendar" element={<CalendarView />} />
@@ -67,6 +76,16 @@ export default function App() {
             <Route path="users" element={<UserManagement />} />
             <Route path="notifications" element={<NotificationManagement />} />
             <Route path="reports" element={<Reports />} />
+          </Route>
+
+          {/* Doctor Protected Routes */}
+          <Route path="/doctor" element={<DoctorLayout />}>
+            <Route index element={<Navigate to="/doctor/dashboard" replace />} />
+            <Route path="dashboard" element={<DoctorDashboard />} />
+            <Route path="appointments" element={<DoctorAppointments />} />
+            <Route path="patients" element={<DoctorPatients />} />
+            <Route path="leave-requests" element={<DoctorLeaveRequests />} />
+            <Route path="notifications" element={<PatientNotifications />} />
           </Route>
 
           {/* Patient Protected Routes */}

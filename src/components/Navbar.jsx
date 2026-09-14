@@ -41,7 +41,7 @@ export const Navbar = ({ toggleMobileSidebar }) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
         {/* Notification Link */}
         <Link
-          to={user?.role === 'ADMIN' ? '/admin/notifications' : '/patient/notifications'}
+          to={user?.role === 'ADMIN' ? '/admin/notifications' : user?.role === 'DOCTOR' ? '/doctor/notifications' : '/patient/notifications'}
           style={{
             position: 'relative',
             color: '#64748b',
@@ -71,7 +71,7 @@ export const Navbar = ({ toggleMobileSidebar }) => {
             width: '38px',
             height: '38px',
             borderRadius: '50%',
-            backgroundColor: user?.role === 'ADMIN' ? '#0ea5e9' : '#10b981',
+            backgroundColor: user?.role === 'ADMIN' ? '#0ea5e9' : user?.role === 'DOCTOR' ? '#f59e0b' : '#10b981',
             color: 'white',
             display: 'flex',
             alignItems: 'center',
@@ -87,8 +87,8 @@ export const Navbar = ({ toggleMobileSidebar }) => {
               {user?.name || 'Tài khoản'}
             </span>
             <span style={{ fontSize: '0.725rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-              <ShieldCheck size={12} style={{ color: user?.role === 'ADMIN' ? '#0ea5e9' : '#10b981' }} />
-              {user?.role === 'ADMIN' ? 'Quản Trị Viên' : 'Bệnh Nhân'}
+              <ShieldCheck size={12} style={{ color: user?.role === 'ADMIN' ? '#0ea5e9' : user?.role === 'DOCTOR' ? '#f59e0b' : '#10b981' }} />
+              {user?.role === 'ADMIN' ? 'Quản Trị Viên' : user?.role === 'DOCTOR' ? 'Bác Sĩ' : 'Bệnh Nhân'}
             </span>
           </div>
         </div>

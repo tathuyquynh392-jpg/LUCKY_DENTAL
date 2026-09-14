@@ -1,21 +1,33 @@
 import React from 'react';
 import { storageService } from '../../services/storage';
-import { Users, UserCheck, Calendar, Clock, DollarSign, Activity } from 'lucide-react';
+import { Users, UserCheck, Calendar, Clock, DollarSign, Activity, Receipt, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { RevenueCharts } from '../../components/RevenueCharts';
 
 export const AdminDashboard = () => {
   const patients = storageService.getPatients();
   const doctors = storageService.getDoctors();
   const appointments = storageService.getAppointments();
-  const treatments = storageService.getTreatments();
   const invoices = storageService.getInvoices();
+  const payments = storageService.getPayments();
+  const services = storageService.getServices();
 
   const totalPatients = patients.length;
-  const totalDoctors = doctors.length;
+  const totalDoctors = doctors.filter(d => d.status === 'Hoạt động' || d.status === 'Đang hoạt động').length;
+  const totalAppointments = appointments.length;
   const pendingApts = appointments.filter(a => a.status === 'PENDING').length;
-  const totalRevenue = invoices
-    .filter(i => i.status === 'Đã thanh toán')
-    .reduce((sum, i) => sum + (Number(i.paidAmount) || 0), 0);
+  const totalInvoices = invoices.length;
+
+  // Real collected revenue from actual payments
+  const realCollectedRevenue = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0) ||
+    invoices.reduce((sum, i) => sum + Number(i.paidAmount || 0), 0);
+
+  // Total debt remaining across all invoices
+  const totalDebt = invoices.reduce((sum, i) => {
+    const total = Number(i.total || i.totalAmount || 0);
+    const paid = Number(i.paidAmount || 0);
+    return sum + Math.max(0, total - paid);
+  }, 0);
 
   return (
     <div>
@@ -33,48 +45,71 @@ export const AdminDashboard = () => {
         </Link>
       </div>
 
-      {/* Metric Cards Grid */}
-      <div className="stat-grid">
+      {/* 6 Key Metric Cards */}
+      <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#e0f2fe', color: '#0284c7' }}>
-            <Users size={26} />
+            <Users size={24} />
           </div>
           <div className="stat-info">
             <div className="stat-value">{totalPatients}</div>
-            <div className="stat-label">Tổng Bệnh Nhân</div>
+            <div className="stat-label">Số Bệnh Nhân</div>
           </div>
         </div>
 
         <div className="stat-card" style={{ borderLeft: '4px solid #10b981' }}>
           <div className="stat-icon" style={{ backgroundColor: '#dcfce7', color: '#16a34a' }}>
-            <UserCheck size={26} />
+            <Calendar size={24} />
+          </div>
+          <div className="stat-info">
+            <div className="stat-value">{totalAppointments}</div>
+            <div className="stat-label">Số Lịch Hẹn</div>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ borderLeft: '4px solid #f59e0b' }}>
+          <div className="stat-icon" style={{ backgroundColor: '#fef3c7', color: '#d97706' }}>
+            <Receipt size={24} />
+          </div>
+          <div className="stat-info">
+            <div className="stat-value">{totalInvoices}</div>
+            <div className="stat-label">Số Hóa Đơn</div>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ borderLeft: '4px solid #0ea5e9' }}>
+          <div className="stat-icon" style={{ backgroundColor: '#e0f2fe', color: '#0ea5e9' }}>
+            <DollarSign size={24} />
+          </div>
+          <div className="stat-info">
+            <div className="stat-value">{realCollectedRevenue.toLocaleString('vi-VN')} đ</div>
+            <div className="stat-label">Doanh Thu Đã Thu</div>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ borderLeft: '4px solid #f43f5e' }}>
+          <div className="stat-icon" style={{ backgroundColor: '#ffe4e6', color: '#f43f5e' }}>
+            <AlertCircle size={24} />
+          </div>
+          <div className="stat-info">
+            <div className="stat-value" style={{ color: '#e11d48' }}>{totalDebt.toLocaleString('vi-VN')} đ</div>
+            <div className="stat-label">Tổng Tiền Còn Nợ</div>
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ borderLeft: '4px solid #8b5cf6' }}>
+          <div className="stat-icon" style={{ backgroundColor: '#f3e8ff', color: '#7c3aed' }}>
+            <UserCheck size={24} />
           </div>
           <div className="stat-info">
             <div className="stat-value">{totalDoctors}</div>
             <div className="stat-label">Bác Sĩ Hoạt Động</div>
           </div>
         </div>
-
-        <div className="stat-card" style={{ borderLeft: '4px solid #f59e0b' }}>
-          <div className="stat-icon" style={{ backgroundColor: '#fef3c7', color: '#d97706' }}>
-            <Clock size={26} />
-          </div>
-          <div className="stat-info">
-            <div className="stat-value">{pendingApts}</div>
-            <div className="stat-label">Lịch Hẹn Đang Chờ</div>
-          </div>
-        </div>
-
-        <div className="stat-card" style={{ borderLeft: '4px solid #6366f1' }}>
-          <div className="stat-icon" style={{ backgroundColor: '#e0e7ff', color: '#4f46e5' }}>
-            <DollarSign size={26} />
-          </div>
-          <div className="stat-info">
-            <div className="stat-value">{totalRevenue.toLocaleString('vi-VN')} đ</div>
-            <div className="stat-label">Doanh Thu Đã Thu</div>
-          </div>
-        </div>
       </div>
+
+      {/* Charts Section */}
+      <RevenueCharts invoices={invoices} payments={payments} services={services} />
 
       {/* Main Content Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>

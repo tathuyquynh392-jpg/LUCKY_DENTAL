@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Sidebar } from '../components/Sidebar';
 import { Navbar } from '../components/Navbar';
 
-export const AdminLayout = () => {
+export const DoctorLayout = () => {
   const { user } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -13,11 +13,11 @@ export const AdminLayout = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role === 'DOCTOR') {
-    return <Navigate to="/doctor/dashboard" replace />;
+  if (user.role === 'ADMIN') {
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
-  if (user.role !== 'ADMIN') {
+  if (user.role === 'PATIENT') {
     return <Navigate to="/patient/dashboard" replace />;
   }
 

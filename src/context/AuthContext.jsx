@@ -38,7 +38,19 @@ export const AuthProvider = ({ children }) => {
           name: 'Nguyễn Văn Quản Lý',
           role: 'ADMIN',
           email: 'admin@luckydental.com',
-          phone: '0901234567'
+          phone: '0901234567',
+          status: 'ACTIVE'
+        };
+      } else if ((cleanUsername === 'doctor' || cleanUsername === 'doctor@luckydental.com') && cleanPassword === 'doctor123') {
+        found = users.find(u => u.role === 'DOCTOR') || {
+          id: 'usr-doc1',
+          username: 'doctor',
+          name: 'BS. CKII. Trần Minh Tuấn',
+          role: 'DOCTOR',
+          email: 'tuan.tran@luckydental.com',
+          phone: '0912345678',
+          doctorId: 'doc-1',
+          status: 'ACTIVE'
         };
       } else if ((cleanUsername === 'patient' || cleanUsername === 'patient@luckydental.com') && cleanPassword === 'patient123') {
         found = users.find(u => u.role === 'PATIENT') || {
@@ -48,12 +60,16 @@ export const AuthProvider = ({ children }) => {
           role: 'PATIENT',
           email: 'patient@luckydental.com',
           phone: '0988776655',
-          patientId: 'pat-1'
+          patientId: 'pat-1',
+          status: 'ACTIVE'
         };
       }
     }
 
     if (found) {
+      if (found.status === 'LOCKED' || found.status === 'Bị khóa') {
+        return { success: false, message: 'Tài khoản của bạn đã bị khóa! Vui lòng liên hệ Admin để hỗ trợ.' };
+      }
       const sessionUser = {
         id: found.id,
         username: found.username,
