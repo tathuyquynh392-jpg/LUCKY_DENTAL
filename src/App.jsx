@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 
 // Layouts
@@ -40,10 +40,8 @@ import { PatientInvoices } from './pages/patient/PatientInvoices';
 import { PatientNotifications } from './pages/patient/PatientNotifications';
 
 export default function App() {
-  const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '/';
-
   return (
-    <BrowserRouter basename={baseUrl}>
+    <HashRouter>
       <AuthProvider>
         <Routes>
           {/* Public Routes */}
@@ -88,6 +86,6 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
