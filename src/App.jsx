@@ -40,7 +40,7 @@ import { PatientInvoices } from './pages/patient/PatientInvoices';
 import { PatientNotifications } from './pages/patient/PatientNotifications';
 
 export default function App() {
-  const baseUrl = import.meta.env.BASE_URL || '/';
+  const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '') || '/';
 
   return (
     <BrowserRouter basename={baseUrl}>
