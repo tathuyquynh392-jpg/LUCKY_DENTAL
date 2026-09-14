@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Lock, Mail, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Sparkles, Lock, Mail, AlertCircle, ArrowLeft, ShieldCheck, UserCheck } from 'lucide-react';
 
 export const LoginPage = () => {
   const [username, setUsername] = useState('admin');
@@ -11,7 +11,7 @@ export const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     setError('');
 
     if (!username.trim() || !password) {
@@ -31,13 +31,27 @@ export const LoginPage = () => {
     }
   };
 
-  const setDemoCredentials = (role) => {
-    if (role === 'ADMIN') {
-      setUsername('admin');
-      setPassword('admin123');
+  const setDemoCredentialsAndLogin = (role) => {
+    setError('');
+    let u = 'admin';
+    let p = 'admin123';
+    if (role === 'PATIENT') {
+      u = 'patient';
+      p = 'patient123';
+    }
+
+    setUsername(u);
+    setPassword(p);
+
+    const res = login(u, p);
+    if (res.success) {
+      if (res.user.role === 'ADMIN') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/patient/dashboard');
+      }
     } else {
-      setUsername('patient');
-      setPassword('patient123');
+      setError(res.message);
     }
   };
 
@@ -71,7 +85,7 @@ export const LoginPage = () => {
 
       <div style={{
         width: '100%',
-        maxWidth: '440px',
+        maxWidth: '460px',
         backgroundColor: '#1e293b',
         borderRadius: '20px',
         border: '1px solid #334155',
@@ -105,46 +119,54 @@ export const LoginPage = () => {
         {/* Quick Demo Credentials Switcher */}
         <div style={{
           backgroundColor: '#0f172a',
-          padding: '0.75rem',
+          padding: '0.875rem',
           borderRadius: '12px',
           border: '1px solid #334155',
           marginBottom: '1.5rem'
         }}>
-          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Chọn tài khoản demo nhanh:
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginBottom: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            ⚡ Nút đăng nhập nhanh Demo (GitHub Pages):
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
             <button
               type="button"
-              onClick={() => setDemoCredentials('ADMIN')}
+              onClick={() => setDemoCredentialsAndLogin('ADMIN')}
               style={{
-                padding: '0.5rem',
-                fontSize: '0.775rem',
+                padding: '0.625rem 0.5rem',
+                fontSize: '0.8rem',
                 fontWeight: 700,
                 borderRadius: '8px',
                 border: username === 'admin' ? '1px solid #0ea5e9' : '1px solid #334155',
                 backgroundColor: username === 'admin' ? '#0ea5e920' : '#1e293b',
                 color: username === 'admin' ? '#38bdf8' : '#cbd5e1',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem'
               }}
             >
-              👑 Admin (admin)
+              <ShieldCheck size={16} /> Admin (admin)
             </button>
             <button
               type="button"
-              onClick={() => setDemoCredentials('PATIENT')}
+              onClick={() => setDemoCredentialsAndLogin('PATIENT')}
               style={{
-                padding: '0.5rem',
-                fontSize: '0.775rem',
+                padding: '0.625rem 0.5rem',
+                fontSize: '0.8rem',
                 fontWeight: 700,
                 borderRadius: '8px',
                 border: username === 'patient' ? '1px solid #10b981' : '1px solid #334155',
                 backgroundColor: username === 'patient' ? '#10b98120' : '#1e293b',
                 color: username === 'patient' ? '#34d399' : '#cbd5e1',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem'
               }}
             >
-              🧑‍⚕️ Patient (patient)
+              <UserCheck size={16} /> Patient (patient)
             </button>
           </div>
         </div>
@@ -176,7 +198,7 @@ export const LoginPage = () => {
                 className="form-control"
                 style={{ paddingLeft: '2.75rem', backgroundColor: '#0f172a', color: 'white', borderColor: '#334155' }}
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => { setUsername(e.target.value); setError(''); }}
                 placeholder="Nhập admin hoặc patient..."
                 required
               />
@@ -192,7 +214,7 @@ export const LoginPage = () => {
                 className="form-control"
                 style={{ paddingLeft: '2.75rem', backgroundColor: '#0f172a', color: 'white', borderColor: '#334155' }}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setError(''); }}
                 placeholder="••••••••"
                 required
               />

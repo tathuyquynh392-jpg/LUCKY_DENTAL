@@ -15,12 +15,12 @@ const KEYS = {
   CURRENT_USER: 'lucky_dental_current_user'
 };
 
-// Default Pre-populated Demo Data
+// Default Pre-populated Demo Data with exact credentials
 const DEFAULT_USERS = [
-  { id: 'usr-admin', username: 'admin', email: 'admin@luckydental.com', name: 'Nguyễn Văn Quản Lý', role: 'ADMIN', status: 'ACTIVE', phone: '0901234567', createdAt: '2026-01-01' },
-  { id: 'usr-pat1', username: 'patient', email: 'patient@luckydental.com', name: 'Trần Thị Bệnh Nhân', role: 'PATIENT', status: 'ACTIVE', phone: '0988776655', patientId: 'pat-1', createdAt: '2026-01-10' },
-  { id: 'usr-pat2', username: 'lemai', email: 'mai.le@gmail.com', name: 'Lê Thị Mai', role: 'PATIENT', status: 'ACTIVE', phone: '0977112233', patientId: 'pat-2', createdAt: '2026-01-15' },
-  { id: 'usr-pat3', username: 'hoanglong', email: 'long.pham@gmail.com', name: 'Phạm Hoàng Long', role: 'PATIENT', status: 'ACTIVE', phone: '0909888777', patientId: 'pat-3', createdAt: '2026-02-01' }
+  { id: 'usr-admin', username: 'admin', email: 'admin@luckydental.com', password: 'admin123', name: 'Nguyễn Văn Quản Lý', role: 'ADMIN', status: 'ACTIVE', phone: '0901234567', createdAt: '2026-01-01' },
+  { id: 'usr-pat1', username: 'patient', email: 'patient@luckydental.com', password: 'patient123', name: 'Trần Thị Bệnh Nhân', role: 'PATIENT', status: 'ACTIVE', phone: '0988776655', patientId: 'pat-1', createdAt: '2026-01-10' },
+  { id: 'usr-pat2', username: 'lemai', email: 'mai.le@gmail.com', password: 'patient123', name: 'Lê Thị Mai', role: 'PATIENT', status: 'ACTIVE', phone: '0977112233', patientId: 'pat-2', createdAt: '2026-01-15' },
+  { id: 'usr-pat3', username: 'hoanglong', email: 'long.pham@gmail.com', password: 'patient123', name: 'Phạm Hoàng Long', role: 'PATIENT', status: 'ACTIVE', phone: '0909888777', patientId: 'pat-3', createdAt: '2026-02-01' }
 ];
 
 const DEFAULT_PATIENTS = [
@@ -127,6 +127,9 @@ export const storageService = {
     getStorage(KEYS.INVOICES, DEFAULT_INVOICES);
     getStorage(KEYS.PAYMENTS, DEFAULT_PAYMENTS);
     getStorage(KEYS.NOTIFICATIONS, DEFAULT_NOTIFICATIONS);
+
+    // Auto-repair user list in localStorage if password field is missing
+    this.getUsers();
   },
 
   getCurrentUser() {
@@ -137,7 +140,25 @@ export const storageService = {
   },
 
   // USERS
-  getUsers() { return getStorage(KEYS.USERS, DEFAULT_USERS); },
+  getUsers() {
+    const users = getStorage(KEYS.USERS, DEFAULT_USERS);
+    let modified = false;
+    const repairedUsers = users.map(u => {
+      if (!u.password) {
+        modified = true;
+        return {
+          ...u,
+          password: u.role === 'ADMIN' ? 'admin123' : 'patient123'
+        };
+      }
+      return u;
+    });
+
+    if (modified) {
+      setStorage(KEYS.USERS, repairedUsers);
+    }
+    return repairedUsers;
+  },
   saveUsers(users) { setStorage(KEYS.USERS, users); },
   addUser(user) {
     const users = this.getUsers();
