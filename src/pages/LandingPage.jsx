@@ -52,7 +52,7 @@ export const LandingPage = () => {
 
           {/* Navigation Links */}
           <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem', fontSize: '0.9rem', fontWeight: 600 }}>
-            <a href="#about" style={{ color: '#334155', textDecoration: 'none' }}>Giới thiệu</a>
+            <Link to="/about" style={{ color: '#334155', textDecoration: 'none' }}>Giới thiệu</Link>
             <a href="#services" style={{ color: '#334155', textDecoration: 'none' }}>Dịch vụ</a>
             <a href="#doctors" style={{ color: '#334155', textDecoration: 'none' }}>Đội ngũ bác sĩ</a>
             <a href="#process" style={{ color: '#334155', textDecoration: 'none' }}>Quy trình</a>
