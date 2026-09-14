@@ -6,6 +6,7 @@ import { storageService } from '../services/storage';
 export const LandingPage = () => {
   const services = storageService.getServices();
   const doctors = storageService.getDoctors();
+  const clinicSettings = storageService.getClinicSettings() || {};
 
   const scrollToSection = (e, sectionId) => {
     e?.preventDefault();
@@ -35,25 +36,33 @@ export const LandingPage = () => {
           justifyContent: 'space-between'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)'
-            }}>
-              <Sparkles size={22} />
-            </div>
+            {clinicSettings.logo ? (
+              <img
+                src={clinicSettings.logo}
+                alt="Clinic Logo"
+                style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '10px' }}
+              />
+            ) : (
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                boxShadow: '0 4px 12px rgba(14, 165, 233, 0.3)'
+              }}>
+                <Sparkles size={22} />
+              </div>
+            )}
             <div>
               <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
-                LUCKY DENTAL
+                {clinicSettings.shortName || 'LUCKY DENTAL'}
               </h1>
               <p style={{ fontSize: '0.7rem', color: '#0ea5e9', fontWeight: 700, marginTop: '-2px' }}>
-                Chăm sóc nụ cười – Kiến tạo tự tin
+                {clinicSettings.slogan || 'Chăm sóc nụ cười – Kiến tạo tự tin'}
               </p>
             </div>
           </div>
@@ -351,21 +360,39 @@ export const LandingPage = () => {
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2.5rem', marginBottom: '3rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-              <Sparkles size={24} style={{ color: '#0ea5e9' }} />
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'white' }}>LUCKY DENTAL</h3>
+              {clinicSettings.logo ? (
+                <img src={clinicSettings.logo} alt="Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+              ) : (
+                <Sparkles size={24} style={{ color: '#0ea5e9' }} />
+              )}
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'white' }}>
+                {clinicSettings.shortName || clinicSettings.name || 'LUCKY DENTAL'}
+              </h3>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-              Hệ Thống Quản Lý Nha Khoa Chuyên Nghiệp - Uy tín & Chất lượng số 1 Việt Nam.
+              {clinicSettings.description || 'Hệ Thống Quản Lý Nha Khoa Chuyên Nghiệp - Uy tín & Chất lượng số 1 Việt Nam.'}
             </p>
           </div>
 
           <div>
             <h4 style={{ color: 'white', fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Liên Hệ</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><MapPin size={16} style={{ color: '#0ea5e9' }} /> 123 Nguyễn Trãi, Q.5, TP.HCM</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Phone size={16} style={{ color: '#0ea5e9' }} /> Hotline: 1900 6868 - 0901234567</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Mail size={16} style={{ color: '#0ea5e9' }} /> contact@luckydental.com</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Clock size={16} style={{ color: '#0ea5e9' }} /> Giờ làm việc: 08:00 - 20:00 (Hàng ngày)</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <MapPin size={16} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+                <span>{clinicSettings.address || '123 Nguyễn Trãi, Q.5, TP.HCM'}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Phone size={16} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+                <span>Hotline: {clinicSettings.phone || '1900 6868 - 0901234567'}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Mail size={16} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+                <span>{clinicSettings.email || 'contact@luckydental.com'}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Clock size={16} style={{ color: '#0ea5e9', flexShrink: 0 }} />
+                <span>Giờ làm việc: {clinicSettings.openingHours || '08:00 - 20:00 (Hàng ngày)'}</span>
+              </div>
             </div>
           </div>
 

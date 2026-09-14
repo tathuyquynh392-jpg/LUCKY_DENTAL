@@ -30,6 +30,8 @@ import { PaymentManagement } from './pages/admin/PaymentManagement';
 import { UserManagement } from './pages/admin/UserManagement';
 import { NotificationManagement } from './pages/admin/NotificationManagement';
 import { Reports } from './pages/admin/Reports';
+import { AdminProfile } from './pages/admin/AdminProfile';
+import { ClinicSettings } from './pages/admin/ClinicSettings';
 
 // Doctor Pages
 import { DoctorDashboard } from './pages/doctor/DoctorDashboard';
@@ -74,6 +76,8 @@ export default function App() {
             <Route path="invoices" element={<InvoiceManagement />} />
             <Route path="payments" element={<PaymentManagement />} />
             <Route path="users" element={<UserManagement />} />
+            <Route path="profile" element={<AdminProfile />} />
+            <Route path="clinic-settings" element={<ClinicSettings />} />
             <Route path="notifications" element={<NotificationManagement />} />
             <Route path="reports" element={<Reports />} />
           </Route>

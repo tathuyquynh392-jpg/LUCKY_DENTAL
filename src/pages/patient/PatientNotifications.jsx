@@ -10,11 +10,13 @@ export const PatientNotifications = () => {
   const [toast, setToast] = useState({ type: 'success', message: '' });
 
   const loadData = () => {
-    const list = storageService.getNotifications().filter(n => !n.userId || n.userId === user?.id || n.userId === user?.patientId || n.userId === 'usr-pat1');
-    setNotifications(list);
+    if (user) {
+      const list = storageService.getNotificationsForUser(user);
+      setNotifications(list);
+    }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, [user]);
 
   const handleMarkRead = (id) => {
     storageService.markNotificationRead(id);
@@ -22,9 +24,11 @@ export const PatientNotifications = () => {
   };
 
   const handleMarkAllRead = () => {
-    storageService.markAllNotificationsRead();
-    loadData();
-    setToast({ type: 'success', message: 'Đã đánh dấu tất cả thông báo là đã đọc!' });
+    if (user) {
+      storageService.markAllNotificationsReadForUser(user);
+      loadData();
+      setToast({ type: 'success', message: 'Đã đánh dấu tất cả thông báo là đã đọc!' });
+    }
   };
 
   return (

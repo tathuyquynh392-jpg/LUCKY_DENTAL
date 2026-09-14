@@ -13,6 +13,7 @@ const KEYS = {
   PAYMENTS: 'lucky_dental_payments',
   NOTIFICATIONS: 'lucky_dental_notifications',
   LEAVE_REQUESTS: 'lucky_dental_leave_requests',
+  CLINIC_SETTINGS: 'lucky_dental_clinic_settings',
   CURRENT_USER: 'lucky_dental_current_user'
 };
 
@@ -105,10 +106,26 @@ const DEFAULT_PAYMENTS = [
 ];
 
 const DEFAULT_NOTIFICATIONS = [
-  { id: 'notif-1', userId: 'usr-pat1', title: 'Xác nhận lịch hẹn', message: 'Lịch hẹn Lấy Cao Răng của bạn vào lúc 09:30 ngày 16/09/2026 đã được BS. Trần Minh Tuấn xác nhận.', isRead: false, createdAt: '2026-09-14 09:00' },
-  { id: 'notif-2', userId: 'usr-pat2', title: 'Nhắc nhở hóa đơn', message: 'Bạn có 1 hóa đơn tẩy trắng răng chưa thanh toán số tiền 2,300,000đ.', isRead: false, createdAt: '2026-09-13 14:20' },
-  { id: 'notif-3', userId: 'usr-admin', title: 'Lịch hẹn mới', message: 'Bệnh nhân Trần Hương Giang vừa đặt lịch hẹn khám tổng quát.', isRead: true, createdAt: '2026-09-14 15:30' }
+  { id: 'notif-1', userId: 'usr-pat1', targetRole: 'PATIENT', title: 'Xác nhận lịch hẹn', message: 'Lịch hẹn Lấy Cao Răng của bạn vào lúc 09:30 ngày 16/09/2026 đã được BS. Trần Minh Tuấn xác nhận.', isRead: false, link: '/patient/appointments', createdAt: '2026-09-14 09:00' },
+  { id: 'notif-2', userId: 'usr-pat2', targetRole: 'PATIENT', title: 'Nhắc nhở hóa đơn', message: 'Bạn có 1 hóa đơn tẩy trắng răng chưa thanh toán số tiền 2,300,000đ.', isRead: false, link: '/patient/invoices', createdAt: '2026-09-13 14:20' },
+  { id: 'notif-3', userId: 'usr-admin', targetRole: 'ADMIN', title: 'Lịch hẹn mới', message: 'Bệnh nhân Trần Hương Giang vừa đặt lịch hẹn khám tổng quát.', isRead: true, link: '/admin/appointments', createdAt: '2026-09-14 15:30' },
+  { id: 'notif-4', targetDoctorId: 'doc-1', targetRole: 'DOCTOR', title: 'Lịch hẹn làm việc mới', message: 'Bạn có 1 lịch hẹn mới với bệnh nhân Trần Thị Bệnh Nhân vào 09:30 ngày 16/09/2026.', isRead: false, link: '/doctor/appointments', createdAt: '2026-09-14 16:00' }
 ];
+
+const DEFAULT_CLINIC_SETTINGS = {
+  name: 'Phòng Khám Nha Khoa Lucky Dental',
+  shortName: 'LUCKY DENTAL',
+  slogan: 'Chăm sóc nụ cười – Kiến tạo tự tin',
+  logo: '',
+  phone: '1900 6868 - 0901234567',
+  email: 'contact@luckydental.com',
+  address: '123 Nguyễn Trãi, Q.5, TP.HCM',
+  openingHours: '08:00 - 20:00 (Hàng ngày)',
+  description: 'Hệ thống phòng khám Nha Khoa Lucky Dental áp dụng công nghệ chẩn đoán hiện đại, trang thiết bị tiên tiến cùng đội ngũ thạc sĩ, bác sĩ hơn 10 năm kinh nghiệm.',
+  mapUrl: 'https://maps.google.com',
+  facebook: 'https://facebook.com/luckydental',
+  zalo: '0901234567'
+};
 
 // Helper Functions
 const getStorage = (key, initial) => {
@@ -147,6 +164,7 @@ export const storageService = {
     getStorage(KEYS.PAYMENTS, DEFAULT_PAYMENTS);
     getStorage(KEYS.NOTIFICATIONS, DEFAULT_NOTIFICATIONS);
     getStorage(KEYS.LEAVE_REQUESTS, DEFAULT_LEAVE_REQUESTS);
+    getStorage(KEYS.CLINIC_SETTINGS, DEFAULT_CLINIC_SETTINGS);
 
     // Auto-repair user list in localStorage if password field is missing
     this.getUsers();
@@ -428,6 +446,20 @@ export const storageService = {
   // NOTIFICATIONS
   getNotifications() { return getStorage(KEYS.NOTIFICATIONS, DEFAULT_NOTIFICATIONS); },
   saveNotifications(notifs) { setStorage(KEYS.NOTIFICATIONS, notifs); },
+  getNotificationsForUser(user) {
+    const all = this.getNotifications();
+    if (!user) return [];
+    return all.filter(n => {
+      if (user.role === 'ADMIN') {
+        return !n.targetRole || n.targetRole === 'ADMIN' || n.userId === user.id || n.userId === 'usr-admin';
+      } else if (user.role === 'DOCTOR') {
+        return n.targetRole === 'DOCTOR' || n.targetDoctorId === user.doctorId || n.userId === user.id || n.userId === 'usr-doc1';
+      } else if (user.role === 'PATIENT') {
+        return n.targetRole === 'PATIENT' || n.targetPatientId === user.patientId || n.userId === user.id || n.userId === 'usr-pat1';
+      }
+      return n.userId === user.id;
+    });
+  },
   addNotification(notif) {
     const list = this.getNotifications();
     const newNotif = {
@@ -447,6 +479,21 @@ export const storageService = {
   markAllNotificationsRead(userId) {
     const list = this.getNotifications().map(n => (!userId || n.userId === userId) ? { ...n, isRead: true } : n);
     this.saveNotifications(list);
+  },
+  markAllNotificationsReadForUser(user) {
+    const userNotifIds = this.getNotificationsForUser(user).map(n => n.id);
+    const list = this.getNotifications().map(n => userNotifIds.includes(n.id) ? { ...n, isRead: true } : n);
+    this.saveNotifications(list);
+  },
+
+  // CLINIC SETTINGS
+  getClinicSettings() { return getStorage(KEYS.CLINIC_SETTINGS, DEFAULT_CLINIC_SETTINGS); },
+  saveClinicSettings(settings) { setStorage(KEYS.CLINIC_SETTINGS, settings); },
+  updateClinicSettings(updated) {
+    const current = this.getClinicSettings();
+    const newSettings = { ...current, ...updated };
+    this.saveClinicSettings(newSettings);
+    return newSettings;
   },
 
   // DOCTOR LEAVE REQUESTS

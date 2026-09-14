@@ -18,7 +18,8 @@ import {
   BarChart3,
   LogOut,
   Sparkles,
-  PlusCircle
+  PlusCircle,
+  Building2
 } from 'lucide-react';
 
 export const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
@@ -44,6 +45,8 @@ export const Sidebar = ({ isMobileOpen, toggleMobileSidebar }) => {
     { to: '/admin/invoices', label: 'Hóa đơn', icon: Receipt },
     { to: '/admin/payments', label: 'Thanh toán', icon: CreditCard },
     { to: '/admin/users', label: 'Tài khoản', icon: UserCog },
+    { to: '/admin/profile', label: 'Thông tin cá nhân', icon: UserCheck },
+    { to: '/admin/clinic-settings', label: 'Cài đặt phòng khám', icon: Building2 },
     { to: '/admin/notifications', label: 'Thông báo', icon: Bell },
     { to: '/admin/reports', label: 'Báo cáo', icon: BarChart3 }
   ];
